@@ -1,0 +1,59 @@
+{
+    "google": {"name": "Google", "url": "google.com"},
+    "g": {"name": "Google", "url": "google.com"},
+    "п": {"name": "Google", "url": "google.com"},
+
+    "gmail": {"name": "Gmail", "url": "mail.google.com"},
+    "gm": {"name": "Gmail", "url": "mail.google.com"},
+    "mail": {"name": "Gmail", "url": "mail.google.com"},
+    "пь": {"name": "Gmail", "url": "mail.google.com"},
+    "ьфшд": {"name": "Gmail", "url": "mail.google.com"},
+
+    "youtube": {"name": "YouTube", "url": "youtube.com"},
+    "yt": {"name": "YouTube", "url": "youtube.com"},
+    "y": {"name": "YouTube", "url": "youtube.com"},
+    "не": {"name": "YouTube", "url": "youtube.com"},
+    "н": {"name": "YouTube", "url": "youtube.com"},
+
+    "youtubemusic": {"name": "YouTube Music", "url": "music.youtube.com"},
+    "music": {"name": "YouTube Music", "url": "music.youtube.com"},
+    "ytm": {"name": "YouTube Music", "url": "music.youtube.com"},
+    "ym": {"name": "YouTube Music", "url": "music.youtube.com"},
+    "ьгышс": {"name": "YouTube Music", "url": "music.youtube.com"},
+    "неь": {"name": "YouTube Music", "url": "music.youtube.com"},
+    "нь": {"name": "YouTube Music", "url": "music.youtube.com"},
+
+    "discord": {"name": "Discord", "url": "discord.com/app"},
+    "ds": {"name": "Discord", "url": "discord.com/app"},
+    "вы": {"name": "Discord", "url": "discord.com/app"},
+
+    "vk": {"name": "VK", "url": "vk.ru"},
+    "вк": {"name": "VK", "url": "vk.ru"},
+    "мл": {"name": "VK", "url": "vk.ru"},
+
+    "translate": {"name": "Google Translate", "url": "translate.google.com"},
+    "екфтыдфеу": {"name": "Google Translate", "url": "translate.google.com"},
+    "переводчик": {"name": "Google Translate", "url": "translate.google.com"},
+
+    "github": {"name": "GitHub", "url": "github.com"},
+    "gh": {"name": "GitHub", "url": "github.com"},
+    "пр": {"name": "GitHub", "url": "github.com"},
+
+    "deepseek": {"name": "Deepseek", "url": "chat.deepseek.com"},
+    "вуузыуул": {"name": "Deepseek", "url": "chat.deepseek.com"},
+    "дипсик": {"name": "Deepseek", "url": "chat.deepseek.com"},
+
+    "qwen": {"name": "Qwen", "url": "chat.qwen.ai"},
+    "йцут": {"name": "Qwen", "url": "chat.qwen.ai"},
+
+    "ozon": {"name": "OZON", "url": "ozon.ru"},
+    "щящт": {"name": "OZON", "url": "ozon.ru"},
+    "озон": {"name": "OZON", "url": "ozon.ru"},
+
+    "dns": {"name": "DNS", "url": "dns-shop.ru"},
+    "вты": {"name": "DNS", "url": "dns-shop.ru"},
+    "днс": {"name": "DNS", "url": "dns-shop.ru"},
+
+    "pinterest": {"name": "Pinterest", "url": "ru.pinterest.com"},
+    "зштеукуые": {"name": "Pinterest", "url": "ru.pinterest.com"}
+}
