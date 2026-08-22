@@ -3,77 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- <link rel="stylesheet" href="css/standart.css"> -->
+    <!-- <link rel="stylesheet" href="css/terminal.css"> -->
     <title>Meow</title>
 </head>
 <body>
+    <div id="standart-style" class="main-box">
+        <div id="left-box">
+            <div class="site-btn-box">
+                <a href="https://github.com" class="site-btn-link">
+                    <img src="icons/github_icon.png" alt="" class="site-btn-icon">
+                </a>
+            </div>
+            <div class="site-btn-box">
+                <a href="https://vk.ru" class="site-btn-link">
+                    <img src="icons/vk_icon.png" alt="" class="site-btn-icon">
+                </a>
+            </div>
+            <div class="site-btn-box">
+                <a href="https://discord.com/app" class="site-btn-link">
+                    <img src="icons/discord_icon.png" alt="" class="site-btn-icon">
+                </a>
+            </div>
+            <div class="site-btn-box">
+                <a href="https://ru.pinterest.com" class="site-btn-link">
+                    <img src="icons/discord_icon.png" alt="" class="site-btn-icon">
+                </a>
+            </div>
+        </div>
 
-    <div id="left-box">
-        <div class="site-btn-box">
-            <a href="https://github.com" class="site-btn-link">
-                <img src="icons/github_icon.png" alt="" class="site-btn-icon">
-            </a>
+        <div id="middle-box">
+            <div id="search-box">
+                <div id="search-engine-box">
+                    <button class="search-engine-btn standart-style">Google</button>
+                    <button class="search-engine-btn standart-style">DuckDuckGo</button>
+                    <button class="search-engine-btn standart-style">YouTube</button>
+                </div>
+                <div id="search-line-box">
+                    <input type="text" id="search-line-input" autocomplete="off" spellcheck="false" autofocus>
+                    <button id="clear-btn" hidden>✕</button>
+                </div>
+                <div id="suggestions-list" hidden>
+                    <!-- <div class="suggestion">abc<span class="suggestion-name">YouTube</span></div>
+                    <div class="suggestion">cde</div>
+                    <span class="suggestion">bebebe</span>
+                    <span class="suggestion">lelele</span> -->
+                </div>
+            </div>
         </div>
-        <div class="site-btn-box">
-            <a href="https://vk.ru" class="site-btn-link">
-                <img src="icons/vk_icon.png" alt="" class="site-btn-icon">
-            </a>
-        </div>
-        <div class="site-btn-box">
-            <a href="https://discord.com/app" class="site-btn-link">
-                <img src="icons/discord_icon.png" alt="" class="site-btn-icon">
-            </a>
-        </div>
-        <div class="site-btn-box">
-            <a href="https://ru.pinterest.com" class="site-btn-link">
-                <img src="icons/discord_icon.png" alt="" class="site-btn-icon">
-            </a>
+
+        <div id="right-box">
+            <div class="site-btn-box">
+                <a href="https://google.com" class="site-btn-link" id="google-menu-btn">
+                    <img src="icons/google_icon.png" alt="" class="site-btn-icon">
+                </a>
+            </div>
+            <div class="site-btn-box">
+                <a href="https://youtube.com" class="site-btn-link">
+                    <img src="icons/youtube_icon.png" alt="" class="site-btn-icon">
+                </a>
+            </div>
+            <div class="site-btn-box">
+                <a href="https://music.youtube.com" class="site-btn-link">
+                    <img src="icons/ytm_icon.png" alt="" class="site-btn-icon">
+                </a>
+            </div>
+            <div class="site-btn-box">
+                <a href="https://chat.deepseek.com" class="site-btn-link" id="ai-menu-btn">
+                    <img src="icons/ai_icon.png" alt="" class="site-btn-icon">
+                </a>
+            </div>
         </div>
     </div>
 
-    <div id="middle-box">
-        <div id="search-box">
-            <div id="search-engine-box">
-                <button class="search-engine-btn">Google</button>
-                <button class="search-engine-btn">DuckDuckGo</button>
-                <button class="search-engine-btn">YouTube</button>
-            </div>
-            <div id="search-line-box">
-                <input type="text" id="search-line-input" autocomplete="off" spellcheck="false" autofocus>
-                <button id="clear-btn" hidden>✕</button>
-            </div>
-            <div id="suggestions-list" hidden>
-                <!-- <div class="suggestion">abc<span class="suggestion-name">YouTube</span></div>
-                <div class="suggestion">cde</div>
-                <span class="suggestion">bebebe</span>
-                <span class="suggestion">lelele</span> -->
-            </div>
-        </div>
-    </div>
 
-    <div id="right-box">
+    <!-- <div id="terminal-style" class="main-box">
+        <div id="left-box">
+            <div class="site-btn-box">
+                <a href="https://github.com" class="site-btn-link">
+                    <img src="icons/github_icon.png" alt="" class="site-btn-icon">
+                </a>
+            </div>
+            <div class="site-btn-box">
+                <a href="https://vk.ru" class="site-btn-link">
+                    <img src="icons/vk_icon.png" alt="" class="site-btn-icon">
+                </a>
+            </div>
+            <div class="site-btn-box">
+                <a href="https://discord.com/app" class="site-btn-link">
+                    <img src="icons/discord_icon.png" alt="" class="site-btn-icon">
+                </a>
+            </div>
+            <div class="site-btn-box">
+                <a href="https://ru.pinterest.com" class="site-btn-link">
+                    <img src="icons/discord_icon.png" alt="" class="site-btn-icon">
+                </a>
+            </div>
+        </div>
 
-        <div class="site-btn-box">
-            <a href="https://github.com" class="site-btn-link">
-                <img src="icons/google_icon.png" alt="" class="site-btn-icon">
-            </a>
+        <div id="middle-box">
+            <div id="search-box">
+                <div id="search-engine-box">
+                    <button class="search-engine-btn">Google</button>
+                    <button class="search-engine-btn">DuckDuckGo</button>
+                    <button class="search-engine-btn">YouTube</button>
+                </div>
+                <div id="search-line-box">
+                    <input type="text" id="search-line-input" autocomplete="off" spellcheck="false" autofocus>
+                    <button id="clear-btn" hidden>✕</button>
+                </div>
+                <div id="suggestions-list" hidden>
+                </div>
+            </div>
         </div>
-        <div class="site-btn-box">
-            <a href="https://youtube.com" class="site-btn-link">
-                <img src="icons/youtube_icon.png" alt="" class="site-btn-icon">
-            </a>
+
+        <div id="right-box">
+            <div class="site-btn-box">
+                <a href="https://google.com" class="site-btn-link" id="google-menu-btn">
+                    <img src="icons/google_icon.png" alt="" class="site-btn-icon">
+                </a>
+            </div>
+            <div class="site-btn-box">
+                <a href="https://youtube.com" class="site-btn-link">
+                    <img src="icons/youtube_icon.png" alt="" class="site-btn-icon">
+                </a>
+            </div>
+            <div class="site-btn-box">
+                <a href="https://music.youtube.com" class="site-btn-link">
+                    <img src="icons/ytm_icon.png" alt="" class="site-btn-icon">
+                </a>
+            </div>
+            <div class="site-btn-box">
+                <a href="https://chat.deepseek.com" class="site-btn-link" id="ai-menu-btn">
+                    <img src="icons/ai_icon.png" alt="" class="site-btn-icon">
+                </a>
+            </div>
         </div>
-        <div class="site-btn-box">
-            <a href="https://music.youtube.com" class="site-btn-link">
-                <img src="icons/ytm_icon.png" alt="" class="site-btn-icon">
-            </a>
-        </div>
-        <div class="site-btn-box">
-            <a href="https://ru.pinterest.com" class="site-btn-link">
-                <img src="icons/ai_icon.png" alt="" class="site-btn-icon">
-            </a>
-        </div>
-    </div>
+    </div> -->
 </body>
 <script src="js/searchline.js"></script>
+<script src="js/focus.js"></script>
+<script src="js/style.js"></script>
 </html>

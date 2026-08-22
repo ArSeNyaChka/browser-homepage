@@ -50,6 +50,7 @@ async function getSuggestions(searchInput) {
         for (let i = 0; i < DDGSuggestions.length; ++i) { DDGSuggestions[i] = {type: "requst", content: DDGSuggestions[i].phrase}; }
     }
 
+    if (selectedEngine !== null) { return DDGSuggestions.slice(0, 5); }
     return suggestions.concat(DDGSuggestions).slice(0, 5);
 }
 
@@ -125,15 +126,20 @@ searchlineInput.addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
         event.preventDefault();
         
-        const value = event.target.value;
+        const value = event.target.value.toLowerCase();
+        const sugContent = suggestions[Math.max(selectedSuggestionIndex, 0)]?.content;
+        const sugType = suggestions[Math.max(selectedSuggestionIndex, 0)]?.type;
         // const suggestionsList = getSitesSuggestions(value);
         
-        if (!suggestions || suggestions.length === 0 || selectedEngine !== null || event.shiftKey || selectedSuggestionIndex === -2) {
+        if (
+            !suggestions ||
+            suggestions.length === 0 ||
+            event.shiftKey ||
+            selectedSuggestionIndex === -2 ||
+            !sugContent.startsWith(value)
+        ) {
             return search(value);
         }
-
-        const sugContent = suggestions[Math.max(selectedSuggestionIndex, 0)].content;
-        const sugType = suggestions[Math.max(selectedSuggestionIndex, 0)].type;
 
         if (sugType === "site") {
             return window.location.href = 'https://' + siteList[sugContent].url;

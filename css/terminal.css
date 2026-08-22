@@ -1,0 +1,112 @@
+.site-btn-icon {
+    width: 128px;
+    /* filter: invert(28%) sepia(66%) saturate(3983%) hue-rotate(274deg) brightness(83%) contrast(110%); */
+    filter: brightness(0) saturate(100%) invert(82%) sepia(96%) saturate(446%) hue-rotate(357deg) brightness(88%) contrast(89%);
+    transition: all 0.6s ;
+}
+
+.site-btn-icon:hover {
+    filter:brightness(0) saturate(100%) invert(82%) sepia(96%) saturate(446%) hue-rotate(357deg) brightness(88%) contrast(89%) drop-shadow(0 0 10px #575638);
+}
+
+/* .site-btn-icon:not(:hover) {
+    animation-play-state: running;
+    animation-direction: reverse;
+} */
+
+@keyframes icon-hower {
+    from {filter: brightness(0) saturate(100%) invert(82%) sepia(96%) saturate(446%) hue-rotate(357deg) brightness(88%) contrast(89%);}
+    to {filter:  brightness(0) saturate(100%) invert(82%) sepia(96%) saturate(446%) hue-rotate(357deg) brightness(88%) contrast(89%) drop-shadow(0 0 10px #575638);}
+}
+
+
+
+#search-box {
+    /* display: flex; */
+    /* flex-direction: column; */
+    /*align-items: stretch; /* Чтобы input растянулся под родителя */
+    height: auto;
+    /* width: ; */
+    /* padding: 20px; */
+}
+
+#search-line-box {
+    margin: 0;
+    border-radius: 999px;
+    background-color: #D6D320;
+    height: auto;
+}
+
+#search-line-input {
+    font-size: 28px;
+    height: 60px;
+    width: 1100px;
+    border: none;
+    border-radius: 999px;
+    margin: 10px;
+    padding: 0 30px;
+    caret-color: #AD20D6;
+    background-color: #575638;
+    color: #ffffff;
+    /* caret-animation: unset; */
+}
+
+#search-engine-box {
+    position: relative;
+    display: flex;
+    padding: 0;
+    bottom: 2px;
+    left: 40px;
+    /* margin: 0 0 5px 20px; */
+}
+
+.search-engine-btn {
+    /* border: 10px solid rgb(124, 238, 31); */
+    border: none;
+    border-radius: 999px;
+    margin: 0 5px;
+    background-color: #D6D320;
+
+}
+
+.search-engine-btn:hover {
+    background-color: #575638;
+}
+
+.selected-search-engine-btn {
+    background-color: #AD20D6;
+}
+
+.selected-search-engine-btn:hover {
+    background-color: #503857;
+}
+
+#suggestions-list {
+    background-color: #575638;
+    margin-top: 10px;
+    border-radius: 40px;
+    padding: 10px;
+}
+
+.disabled-suggestions-list {
+    background-color: gray !important;
+}
+
+.suggestion {
+    display: block;
+    background-color: #D6D320;
+    margin: 5px;
+    padding: 5px 15px;
+    font-size: 28px;
+    border-radius: 999px;
+}
+
+.active-suggestion {
+    background-color: #AD20D6;
+}
+
+.suggestion-name {
+    color: #575638;
+    font-size: 24px;
+    margin-left: 2rem;
+}
