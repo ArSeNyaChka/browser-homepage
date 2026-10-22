@@ -18,23 +18,18 @@
     const DDG_TTL_MS = 3000;
     const MAX_SUGGESTIONS = 8;
 
-    let siteList = {};
+    const escapeHtml = window.escapeHtml;
+
     let suggestions = [];
     let selectedIndex = -1;
     let selectedEngine = null;
     let requestId = 0;
     const ddgCache = new Map();
 
-    const escapeHtml = (str) => str
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;');
-
-    /** Подсказки из sites.json по началу алиаса (в т.ч. русские раскладки). */
+    /** Подсказки по началу алиаса (в т.ч. русские раскладки). */
     const getSiteSuggestions = (query) => {
         const prefix = query.toLowerCase();
-        return Object.entries(siteList)
+        return Object.entries(window.sites.all())
             .filter(([alias]) => alias.startsWith(prefix))
             .slice(0, MAX_SUGGESTIONS)
             .map(([alias, site]) => ({ type: 'site', text: alias, name: site.name }));
@@ -111,7 +106,7 @@
     };
 
     const openSite = (alias) => {
-        window.location.href = `https://${siteList[alias].url}`;
+        window.location.href = `https://${window.sites.all()[alias].url}`;
     };
 
     const search = (query) => {
@@ -127,7 +122,7 @@
     const activate = (suggestion) => {
         const typed = input.value.trim().toLowerCase();
         if (!suggestion) {
-            siteList[typed] ? openSite(typed) : search(input.value);
+            window.sites.all()[typed] ? openSite(typed) : search(input.value);
             return;
         }
         suggestion.type === 'site' ? openSite(suggestion.text) : search(suggestion.text);
@@ -222,16 +217,7 @@
         });
     });
 
-    const init = async () => {
-        try {
-            const response = await fetch('sites.json');
-            siteList = await response.json();
-        } catch {
-            console.warn('Не удалось загрузить sites.json — подсказки сайтов недоступны');
-        }
-
-        input.focus();
-    };
-
-    init();
+    // Алиасы загружает sites.js — здесь ждём готовности, чтобы подсказки
+    // были доступны с первого нажатия клавиши
+    window.sites.ready.then(() => input.focus());
 })();

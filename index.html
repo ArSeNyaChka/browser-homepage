@@ -66,7 +66,37 @@
         </nav>
     </main>
 
+    <button id="aliases-open-btn" class="aliases-open-btn" aria-haspopup="dialog" title="Управление алиасами">⚙</button>
+
+    <dialog id="aliases-dialog" class="aliases-dialog" aria-labelledby="aliases-title">
+        <div class="aliases-dialog__head">
+            <h2 id="aliases-title" class="aliases-dialog__title">Алиасы сайтов</h2>
+            <button id="aliases-close-btn" class="aliases-dialog__close" aria-label="Закрыть">✕</button>
+        </div>
+
+        <form id="alias-form" class="alias-form">
+            <input id="alias-name" class="alias-form__input" placeholder="Название, например Notion" autocomplete="off" required>
+            <input id="alias-url" class="alias-form__input" placeholder="Адрес, например notion.so" autocomplete="off" required>
+            <input id="alias-values" class="alias-form__input alias-form__input--wide" placeholder="Алиасы через пробел: n, нот, н" autocomplete="off" required>
+            <button type="submit" class="alias-form__submit">Добавить</button>
+        </form>
+
+        <ul id="aliases-list" class="aliases-list"></ul>
+
+        <div class="aliases-dialog__footer">
+            <label class="aliases-file-btn">Импорт
+                <input id="aliases-import-file" type="file" accept="application/json,.json" hidden>
+            </label>
+            <button id="aliases-export-btn" class="aliases-file-btn">Экспорт</button>
+            <button id="aliases-reset-btn" class="aliases-file-btn aliases-file-btn--danger">Сбросить</button>
+            <p id="aliases-status" class="aliases-status" role="status" aria-live="polite"></p>
+        </div>
+    </dialog>
+
+    <script src="js/utils.js"></script>
+    <script src="js/sites.js"></script>
     <script src="js/searchline.js"></script>
+    <script src="js/aliases-panel.js"></script>
     <script src="js/ui.js"></script>
 </body>
 </html>

@@ -35,9 +35,11 @@
         },
     };
 
-    // Строка поиска — главный элемент страницы: клик в любом её месте возвращает фокус в ввод
+    // Строка поиска — главный элемент страницы: клик в любом её месте возвращает фокус в ввод.
+    // Клики внутри диалога и по интерактивным элементам игнорируем,
+    // иначе фокус вырывался бы из полей панели алиасов
     document.body.addEventListener('click', (event) => {
-        if (event.target.closest('a, button, li')) { return; }
+        if (event.target.closest('a, button, li, input, label, dialog')) { return; }
 
         document.getElementById('search-line-input')?.focus();
     });

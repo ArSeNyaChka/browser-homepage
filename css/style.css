@@ -268,6 +268,242 @@ input:focus {
     color: var(--color-surface-highlight);
 }
 
+/* ─── Кнопка панели алиасов ─── */
+.aliases-open-btn {
+    position: fixed;
+    right: clamp(0.5rem, 2vw, 1.5rem);
+    bottom: clamp(0.5rem, 2vw, 1.5rem);
+    width: clamp(40px, 5vw, 52px);
+    height: clamp(40px, 5vw, 52px);
+    border: none;
+    border-radius: 50%;
+    background-color: var(--color-surface);
+    color: var(--color-surface-highlight);
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease,
+                transform var(--transition-speed) ease;
+}
+
+.aliases-open-btn:hover {
+    background-color: var(--color-surface-highlight);
+    color: var(--color-surface);
+    transform: rotate(90deg);
+}
+
+/* ─── Диалог управления алиасами ─── */
+/* display в этом же правиле перебивает UA-скрытие, поэтому закрываем явно */
+.aliases-dialog:not([open]) {
+    display: none;
+}
+
+.aliases-dialog {
+    width: min(560px, calc(100vw - 2rem));
+    max-height: min(80vh, 700px);
+    padding: 1.25rem;
+    border: none;
+    border-radius: var(--radius-card);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.aliases-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.65);
+}
+
+.aliases-dialog__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.aliases-dialog__title {
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.aliases-dialog__close {
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 1.25rem;
+    cursor: pointer;
+}
+
+.aliases-dialog__close:hover {
+    color: var(--color-text);
+}
+
+/* Форма добавления */
+.alias-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.alias-form__input {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-surface);
+    border-radius: var(--radius-pill);
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    font-size: 0.9rem;
+    font-family: inherit;
+}
+
+.alias-form__input--wide {
+    grid-column: 1 / -1;
+}
+
+.alias-form__input:focus {
+    border-color: var(--color-accent);
+}
+
+.alias-form__submit {
+    grid-column: 1 / -1;
+    border: none;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-accent);
+    color: var(--color-text);
+    font-size: 0.9rem;
+    font-family: inherit;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease;
+}
+
+.alias-form__submit:hover {
+    background-color: var(--color-accent-dark);
+}
+
+/* Список сайтов */
+.aliases-list {
+    list-style: none;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-height: 80px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-surface-highlight) transparent;
+}
+
+.aliases-list__empty {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.alias-group {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-pill);
+    padding: 0.4rem 0.9rem;
+}
+
+.alias-group__head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.alias-group__name {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.alias-group__url {
+    flex: 1;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.alias-group__remove {
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.alias-group__remove:hover {
+    color: var(--color-accent);
+}
+
+.alias-group__aliases {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    padding: 0.3rem 0 0.2rem;
+}
+
+.alias-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background-color: var(--color-surface-highlight);
+    color: var(--color-bg);
+    border-radius: var(--radius-pill);
+    padding: 0.1rem 0.5rem;
+    font-size: 0.78rem;
+}
+
+.alias-chip__remove {
+    border: none;
+    background: transparent;
+    color: inherit;
+    opacity: 0.6;
+    cursor: pointer;
+    font-size: 0.7rem;
+}
+
+.alias-chip__remove:hover {
+    opacity: 1;
+}
+
+/* Нижняя строка: импорт, экспорт, сброс, статус */
+.aliases-dialog__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.aliases-file-btn {
+    border-radius: var(--radius-pill);
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    font-size: 0.85rem;
+    padding: 0.4rem 0.9rem;
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease;
+}
+
+.aliases-file-btn:hover {
+    background-color: var(--color-surface-highlight);
+    color: var(--color-bg);
+}
+
+.aliases-file-btn--danger:hover {
+    background-color: var(--color-accent);
+    color: var(--color-text);
+}
+
+.aliases-status {
+    flex: 1;
+    min-width: 120px;
+    text-align: right;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
 /* ─── Адаптив ─── */
 
 /* Планшет: правая панель уходит вниз, левая остаётся сбоку */
@@ -313,12 +549,25 @@ input:focus {
         padding: 0;
     }
 
+    /* Плавающая кнопка панели алиасов лежит в том же углу, что и нижний ряд иконок */
+    .sidebar--right {
+        padding-bottom: calc(var(--icon-size) + 0.5rem);
+    }
+
     :root {
         --max-input-width: 100%;
     }
 
     .center-panel {
         padding: 1rem 0;
+    }
+
+    .alias-form {
+        grid-template-columns: 1fr;
+    }
+
+    .aliases-status {
+        text-align: left;
     }
 }
 
