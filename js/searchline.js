@@ -26,15 +26,6 @@
     let requestId = 0;
     const ddgCache = new Map();
 
-    /** Подсказки по началу алиаса (в т.ч. русские раскладки). */
-    const getSiteSuggestions = (query) => {
-        const prefix = query.toLowerCase();
-        return Object.entries(window.sites.all())
-            .filter(([alias]) => alias.startsWith(prefix))
-            .slice(0, MAX_SUGGESTIONS)
-            .map(([alias, site]) => ({ type: 'site', text: alias, name: site.name }));
-    };
-
     /** Строки поиска DuckDuckGo; результат кэшируется, чтобы не долбить API на каждый символ. */
     const getDdgSuggestions = async (query) => {
         const cached = ddgCache.get(query);
@@ -96,7 +87,7 @@
             return;
         }
 
-        const siteSuggestions = getSiteSuggestions(query);
+        const siteSuggestions = window.sites.findSites(query, MAX_SUGGESTIONS);
         const ddgSuggestions = await getDdgSuggestions(query);
         if (currentRequest !== requestId) { return; }
 
@@ -116,13 +107,14 @@
 
     /**
      * Общий обработчик Enter и клика.
-     * Точно введённый алиас (например «вк» или «vk») открывает сайт сразу —
-     * иначе привычный «набрал vk, нажал Enter» превратился бы в поиск по слову vk.
+     * Точно введённый алиас открывает сайт сразу — иначе привычный
+     * «набрал vk, нажал Enter» превратился бы в поиск по слову vk.
+     * Раскладка учитывается, поэтому «вк» и «vk» дают один результат.
      */
     const activate = (suggestion) => {
-        const typed = input.value.trim().toLowerCase();
         if (!suggestion) {
-            window.sites.all()[typed] ? openSite(typed) : search(input.value);
+            const exact = window.sites.findSite(input.value);
+            exact ? openSite(exact.alias) : search(input.value);
             return;
         }
         suggestion.type === 'site' ? openSite(suggestion.text) : search(suggestion.text);

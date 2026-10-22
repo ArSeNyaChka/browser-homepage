@@ -19,6 +19,8 @@
     const defaults = {};
     let edits = { custom: {}, hidden: [] };
     let merged = {};
+    /** Черновой вариант merged с алиасами, приведёнными к английской раскладке. */
+    let byEnLayout = new Map();
     const listeners = new Set();
 
     const normalizeAlias = (value) => {
@@ -89,7 +91,46 @@
             Object.entries(defaults).filter(([alias]) => !edits.hidden.includes(alias))
         );
         Object.assign(merged, edits.custom);
+
+        // Ключ — алиас в английской раскладке, значение — исходный алиас.
+        // Один сайт может покрываться несколькими алиасами («vk» и «вк»),
+        // поэтому при коллизии оставляем первый: он же короче по вставке.
+        byEnLayout = new Map();
+        for (const alias of Object.keys(merged)) {
+            const key = window.layout.toEnLayout(alias);
+            if (!byEnLayout.has(key)) { byEnLayout.set(key, alias); }
+        }
+
         listeners.forEach((callback) => callback(merged));
+    };
+
+    /**
+     * Подбор сайтов по началу строки с учётом раскладки.
+     *
+     * И запрос, и алиасы приводятся к английской раскладке, поэтому «вк», «vk»
+     * и «вкф» дают один и тот же сайт — дубли-кракозябры в конфиге больше не нужны.
+     * Результат группируется по адресу: у одного сайта много алиасов, и без
+     * группировки в подсказках ехали бы «vk», «вк», «мл» вместо трёх разных сайтов.
+     */
+    const findSites = (query, limit = 8) => {
+        const prefix = window.layout.toEnLayout(String(query ?? '').trim().toLowerCase());
+        if (!prefix) { return []; }
+
+        const seen = new Set();
+        const result = [];
+
+        for (const [key, alias] of byEnLayout) {
+            if (!key.startsWith(prefix)) { continue; }
+
+            const site = merged[alias];
+            if (seen.has(site.url)) { continue; }
+
+            seen.add(site.url);
+            result.push({ type: 'site', text: alias, name: site.name, url: site.url });
+            if (result.length >= limit) { break; }
+        }
+
+        return result;
     };
 
     const ready = (async () => {
@@ -104,17 +145,40 @@
         await persist();
     })();
 
+    /** Точное совпадение с учётом раскладки: «вк» и «vk» ведут на один алиас. */
+    const findSite = (query) => {
+        const key = window.layout.toEnLayout(String(query ?? '').trim().toLowerCase());
+        const alias = byEnLayout.get(key);
+        return alias ? { alias, ...merged[alias] } : null;
+    };
+
+    /**
+     * Алиас, который уже занимает те же клавиши раскладки.
+     * «пр» и «gh» — один набор клавиш, поэтому второй из них найти нельзя:
+     * добавляя алиас, надо понять, не перекрывает ли он уже существующий сайт.
+     */
+    const layoutOwner = (alias) => byEnLayout.get(window.layout.toEnLayout(alias)) ?? null;
+
     /** Добавляет группу «сайт + алиасы», возвращает сколько алиасов принято. */
     const addSite = async ({ name, url, aliases }) => {
         const site = normalizeSite({ name, url });
-        if (!site) { return { added: 0, skipped: 0 }; }
+        if (!site) { return { added: 0, skipped: 0, conflicts: [] }; }
 
         const wanted = [...new Set(String(aliases ?? '').split(/[\s,;]+/).map(normalizeAlias).filter(Boolean))];
-        if (wanted.length === 0) { return { added: 0, skipped: 0 }; }
+        if (wanted.length === 0) { return { added: 0, skipped: 0, conflicts: [] }; }
 
         let added = 0;
+        let skipped = 0;
+        const conflicts = [];
+
         for (const alias of wanted) {
-            if (isSameEntry(merged[alias], site)) { continue; }
+            const owner = layoutOwner(alias);
+
+            if (owner && owner !== alias && merged[owner].url !== site.url) {
+                conflicts.push({ alias, takenBy: owner, url: merged[owner].url });
+                continue;
+            }
+            if (isSameEntry(merged[alias], site)) { skipped += 1; continue; }
 
             edits.custom[alias] = site;
             edits.hidden = edits.hidden.filter((hidden) => hidden !== alias);
@@ -122,7 +186,7 @@
         }
 
         if (added > 0) { await persist(); }
-        return { added, skipped: wanted.length - added };
+        return { added, skipped, conflicts };
     };
 
     const removeAlias = async (alias) => {
@@ -184,6 +248,8 @@
     window.sites = {
         ready,
         all: () => merged,
+        findSites,
+        findSite,
         addSite,
         removeAlias,
         removeSite,

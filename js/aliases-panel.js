@@ -59,19 +59,25 @@
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
-        const { added, skipped } = await window.sites.addSite({
+        const { added, skipped, conflicts } = await window.sites.addSite({
             name: nameInput.value,
             url: urlInput.value,
             aliases: aliasesInput.value,
         });
 
+        // Алиас, совпадающий по клавишам раскладки с чужим, всё равно что опечатка:
+        // его нельзя набрать, поэтому о таком надо сказать прямо
+        const conflictNote = conflicts.length
+            ? `. Занято: ${conflicts.map((c) => `${c.alias} → ${c.takenBy}`).join(', ')}`
+            : '';
+
         if (added === 0) {
-            showStatus(skipped ? 'Такие алиасы уже есть' : 'Проверьте адрес и алиасы');
+            showStatus((skipped ? 'Такие алиасы уже есть' : 'Проверьте адрес и алиасы') + conflictNote);
             return;
         }
 
         form.reset();
-        showStatus(`Добавлено алиасов: ${added}${skipped ? `, пропущено: ${skipped}` : ''}`);
+        showStatus(`Добавлено алиасов: ${added}${skipped ? `, пропущено: ${skipped}` : ''}${conflictNote}`);
     });
 
     list.addEventListener('click', async (event) => {

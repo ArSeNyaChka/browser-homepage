@@ -19,6 +19,7 @@ globalThis.fetch = async (url) => {
 
 const loadSites = () => vm.runInThisContext(fs.readFileSync(new URL('../js/sites.js', import.meta.url), 'utf8'), { filename: 'sites.js' });
 
+vm.runInThisContext(fs.readFileSync(new URL('../js/layout.js', import.meta.url), 'utf8'), { filename: 'layout.js' });
 loadSites();
 await globalThis.sites.ready;
 
@@ -65,10 +66,15 @@ check('скрытие базового алиаса записано в хран
 const removed = await globalThis.sites.removeSite('notion.so/app');
 check('removeSite убирает все алиасы сайта', removed === 3 && all().n === undefined && all()['нот'] === undefined, `removed=${removed}`);
 
+// Количество алиасов vk в sites.json менять разрешено, поэтому ожидаемое число
+// берём из состояния до удаления, а не из литерала
+const vkAliases = Object.keys(all()).filter((alias) => all()[alias].url === 'vk.ru');
 const removedBase = await globalThis.sites.removeSite('vk.ru');
 check('removeSite базового сайта скрывает все его алиасы',
-    removedBase === 3 && all().vk === undefined && all()['вк'] === undefined && all()['мл'] === undefined,
-    `removed=${removedBase}`);
+    removedBase === vkAliases.length
+    && removedBase >= 2
+    && vkAliases.every((alias) => all()[alias] === undefined),
+    `removed=${removedBase}, алиасов было: ${vkAliases.join(',')}`);
 await globalThis.sites.reset();
 check('reset возвращает скрытый базовый сайт', all()['вк']?.url === 'vk.ru');
 
@@ -120,3 +126,66 @@ const esc = globalThis.escapeHtml;
 check('escapeHtml нейтрализует разметку',
     esc('<img src=x onerror=alert(1)>') === '&lt;img src=x onerror=alert(1)&gt;',
     esc('<img src=x onerror=alert(1)>'));
+
+// ── Раскладка ────────────────────────────────────────────────
+const { toEnLayout, toRuLayout } = globalThis.layout;
+
+check('toEnLayout переводит кириллицу в латиницу', toEnLayout('вуузыуул') === 'deepseek');
+check('toRuLayout — обратное преобразование', toRuLayout('deepseek') === 'вуузыуул');
+check('преобразования обратимы', toEnLayout(toRuLayout('deepseek')) === 'deepseek');
+// Точка и «ю» — одна клавиша, поэтому обратное преобразование адреса в русскую
+// раскладку даёт «кракозябру»; важно, что сравнение идёт в английской и точка не теряется
+check('адреса с точками и дефисами не теряются при нормализации',
+    toEnLayout('notion.so') === 'notion.so' && toEnLayout('dns-shop.ru') === 'dns-shop.ru');
+check('регистр сохраняется', toEnLayout('МЛ') === 'VK' && toRuLayout('VK') === 'МЛ', `${toEnLayout('МЛ')}/${toRuLayout('VK')}`);
+check('несовпадающие символы остаются как есть', toEnLayout('пр-1') === 'gh-1', toEnLayout('пр-1'));
+
+// Преобразование не должно зависеть от того, в какой раскладке алиас записан
+await globalThis.sites.addSite({ name: 'Раскладка', url: 'layout.example.com', aliases: 'layouttest' });
+const ruAlias = toRuLayout('layouttest');
+check('латинский алиас находится при вводе по-русски',
+    globalThis.sites.findSites(ruAlias).some((s) => s.name === 'Раскладка'), `запрос: ${ruAlias}`);
+check('латинский алиас находится при вводе латиницей',
+    globalThis.sites.findSites('layouttest').some((s) => s.name === 'Раскладка'));
+
+await globalThis.sites.addSite({ name: 'Кириллица', url: 'cyril.example.com', aliases: 'щщщ' });
+check('кириллический алиас находится при вводе латиницей',
+    globalThis.sites.findSites(toEnLayout('щщщ')).some((s) => s.name === 'Кириллица'), `запрос: ${toEnLayout('щщщ')}`);
+check('кириллический алиас находится при вводе по-русски',
+    globalThis.sites.findSites('щщщ').some((s) => s.name === 'Кириллица'));
+
+check('базовые сайты находятся в обеих раскладках',
+    globalThis.sites.findSites('vk').some((s) => s.url === 'vk.ru')
+    && globalThis.sites.findSites(toRuLayout('vk')).some((s) => s.url === 'vk.ru'),
+    `${JSON.stringify(globalThis.sites.findSites('vk')[0])} / ${JSON.stringify(globalThis.sites.findSites(toRuLayout('vk'))[0])}`);
+
+// Один сайт закрыт несколькими алиасами — в выдаче он должен быть один раз
+const vkHits = globalThis.sites.findSites('v');
+check('несколько алиасов одного сайта сворачиваются в одну подсказку',
+    vkHits.filter((s) => s.url === 'vk.ru').length === 1,
+    vkHits.map((s) => `${s.text}→${s.url}`).join(', '));
+
+check('подсказки ограничены лимитом', globalThis.sites.findSites('a', 2).length <= 2);
+check('пустой запрос не даёт подсказок', globalThis.sites.findSites('').length === 0);
+check('регистр запроса не важен',
+    JSON.stringify(globalThis.sites.findSites('VK')) === JSON.stringify(globalThis.sites.findSites('vk')));
+
+// Точное совпадение — то, что использует Enter
+check('findSite находит латинский алиас', globalThis.sites.findSite('vk')?.url === 'vk.ru');
+check('findSite находит его же в русской раскладке', globalThis.sites.findSite(toRuLayout('vk'))?.url === 'vk.ru',
+    JSON.stringify(globalThis.sites.findSite(toRuLayout('vk'))));
+check('findSite находит кириллический алиас латиницей', globalThis.sites.findSite(toEnLayout('щщщ'))?.url === 'cyril.example.com');
+check('findSite возвращает исходное написание алиаса', globalThis.sites.findSite('щщщ')?.alias === 'щщщ');
+check('findSite не угадывает чепуху', globalThis.sites.findSite('zzzzqqq') === null);
+check('findSite игнорирует лишние пробелы', globalThis.sites.findSite('  vk  ')?.url === 'vk.ru');
+
+// Алисы, совпадающие по клавишам раскладки: «пр» и «gh» — один набор клавиш
+const sameSite = await globalThis.sites.addSite({ name: 'GitHub', url: 'github.com', aliases: 'пр' });
+check('алиас тех же клавиш для того же сайта принимается',
+    sameSite.added === 1 && sameSite.conflicts.length === 0, JSON.stringify(sameSite));
+
+const clash = await globalThis.sites.addSite({ name: 'Conflicting', url: 'conflict.example.com', aliases: 'пр' });
+check('алиас тех же клавиш для чужого сайта отклоняется',
+    clash.added === 0 && clash.conflicts[0]?.alias === 'пр' && clash.conflicts[0]?.takenBy === 'gh',
+    JSON.stringify(clash));
+check('конфликт не перебивает существующий алиас', globalThis.sites.findSite('пр')?.url === 'github.com');
