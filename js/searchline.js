@@ -1,300 +1,237 @@
-const searchlineInput = document.getElementById("search-line-input");
-const suggestionsList = document.getElementById("suggestions-list");
-const clearBtn = document.getElementById("clear-btn");
-const searchEngineBtns = document.querySelectorAll(".search-engine-btn");
-
-const SearchEngines = Object.freeze({
-    GOOGLE: 'Google',
-    DUCKDUCKGO: 'DuckDuckGo',
-    YOUTUBE: 'YouTube'
-});
-
-// States
-let suggestions = []; // массив подсказок
-let DDGSuggestions = [];
-let selectedSuggestionIndex = -1; // индекс выбранной подсказки
-// let isNavigating = false; // флаг навигации клавишами
-// let abortController = null; // для отмены предыдущего запроса
-let debounceTimer = Date.now();
-let lastTypeTime = Date.now();
-let siteList = null;
-let selectedEngine = null;
-
-
-// Call onload
-async function loadSiteList() {
-    const localSiteList = localStorage.getItem('siteList');
-
-    if (localSiteList === null) {  // Load standart siteList
-        const response = await fetch('sites.json');
-        siteList = await response.json();
-        localStorage.setItem('siteList', JSON.stringify(siteList));
-    } else {
-        siteList = JSON.parse(localSiteList);
-    }
-
-    // Sorting
-    siteList = Object.fromEntries(Object.entries(siteList).sort(([keyA], [keyB]) => keyA.localeCompare(keyB)));
-}
-
-
-async function getSuggestions(searchInput) {
-    if (searchInput.length === 0) { return []; }
-
-    let suggestions = getSitesSuggestions(searchInput);
-    for (let i = 0; i < suggestions.length; ++i) { suggestions[i] = {type: "site", content: suggestions[i]}; }
-
-    if (Date.now() - debounceTimer > 2500) {
-        debounceTimer = Date.now();
-        DDGSuggestions = await getDDGSuggestions(searchInput);
-        for (let i = 0; i < DDGSuggestions.length; ++i) { DDGSuggestions[i] = {type: "requst", content: DDGSuggestions[i].phrase}; }
-    }
-
-    if (selectedEngine !== null) { return DDGSuggestions.slice(0, 5); }
-    return suggestions.concat(DDGSuggestions).slice(0, 5);
-}
-
-
-function getSitesSuggestions(searchInput) {
-    return Object.keys(siteList).filter(key => key.toLowerCase().startsWith(searchInput.toLowerCase())).slice(0, 5);
-}
-
-
-async function getDDGSuggestions(searchInput) {
-    const firstWord = searchInput.split(' ')[0];
-    if (siteList[firstWord] !== undefined && ['google.com', 'youtube.com', 'duckduckgo.com'].includes(siteList[firstWord].url)) {
-        searchInput = searchInput.slice(firstWord);
-    }
-
-    const res = await fetch(`https://duckduckgo.com/ac/?q=${encodeURIComponent(searchInput)}`);
-    const sugs = await res.json();
-    // console.log("sugs:")
-    // console.log(sugs);
-    return sugs;
-}
-
-
-function search(request) {
-    if (selectedEngine === null || selectedEngine === SearchEngines.GOOGLE) {
-        window.location.href = `https://www.google.com/search?q=${encodeURIComponent(request)}`;
-    } else if (selectedEngine === SearchEngines.YOUTUBE) {
-        window.location.href = `https://www.youtube.com/results?search_query=${encodeURIComponent(request)}`;
-    } else if (selectedEngine === SearchEngines.DUCKDUCKGO) {
-        window.location.href = `https://duckduck.com/?q=${encodeURIComponent(request)}`;
-    } else {
-        alert(selectedEngine);
-    }
-}
-
-/*
- * EventListeners
+/**
+ * Поисковая строка: подсказки сайтов + строки поиска DuckDuckGo.
  */
-searchlineInput.addEventListener('input', (event) => {
-    async function renderSuggestionList(inTimeout = false) {
-        if (inTimeout && Date.now() - lastTypeTime < 700) { return; }
-        else if (inTimeout) { debounceTimer -= 3000; }
+(() => {
+    'use strict';
 
-        const value = searchlineInput.value;
-        suggestions = await getSuggestions(value);
-        // console.log("suggestions:")
-        // console.log(suggestions);
+    const input = document.getElementById('search-line-input');
+    const suggestionsList = document.getElementById('suggestions-list');
+    const clearBtn = document.getElementById('clear-btn');
+    const engineBtns = document.querySelectorAll('.engine-btn');
 
-        if (!suggestions || suggestions.length === 0 || !value || value.length === 0) {
+    const ENGINE_BY_ATTRIBUTE = {
+        google: 'https://www.google.com/search?q=',
+        duckduckgo: 'https://duckduckgo.com/?q=',
+        youtube: 'https://www.youtube.com/results?search_query=',
+    };
+
+    const DDG_TTL_MS = 3000;
+    const MAX_SUGGESTIONS = 8;
+
+    let siteList = {};
+    let suggestions = [];
+    let selectedIndex = -1;
+    let selectedEngine = null;
+    let requestId = 0;
+    const ddgCache = new Map();
+
+    const escapeHtml = (str) => str
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;');
+
+    /** Подсказки из sites.json по началу алиаса (в т.ч. русские раскладки). */
+    const getSiteSuggestions = (query) => {
+        const prefix = query.toLowerCase();
+        return Object.entries(siteList)
+            .filter(([alias]) => alias.startsWith(prefix))
+            .slice(0, MAX_SUGGESTIONS)
+            .map(([alias, site]) => ({ type: 'site', text: alias, name: site.name }));
+    };
+
+    /** Строки поиска DuckDuckGo; результат кэшируется, чтобы не долбить API на каждый символ. */
+    const getDdgSuggestions = async (query) => {
+        const cached = ddgCache.get(query);
+        if (cached && Date.now() - cached.time < DDG_TTL_MS) {
+            return cached.items;
+        }
+
+        let items = [];
+        try {
+            const response = await fetch(`https://duckduckgo.com/ac/?q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+            items = data.map(({ phrase }) => ({ type: 'search', text: phrase, name: '' }));
+        } catch {
+            // Офлайн или заблокирован запрос — оставляем только сайты
+        }
+
+        ddgCache.set(query, { time: Date.now(), items });
+        return items;
+    };
+
+    const render = () => {
+        if (suggestions.length === 0) {
             suggestionsList.hidden = true;
             return;
         }
-        
-        let html = "";
-        // const suggestionsListLenght = suggestions.length < 6 ? suggestions.length : 5;
-        // for (let i = 0; i < suggestions.length; i++) {
-        //     html += `<div class="suggestion">${suggestions[i]}<span class="suggestion-name">${siteList[suggestions[i]].name}</span></div>`;
-        // }
-        suggestions.forEach((suggestion) => {
-            html += `<div class="suggestion">${suggestion.content}<span class="suggestion-name">${suggestion.type === "site" ? siteList[suggestion.content].name : ""}</span></div>`;
-        });
-        
+
+        suggestionsList.innerHTML = suggestions
+            .map(({ text, name }, index) => {
+                const label = name ? `<span class="suggestion-item__name">${escapeHtml(name)}</span>` : '';
+                const selected = index === selectedIndex ? 'true' : 'false';
+                return `<li class="suggestion-item" role="option" data-index="${index}" aria-selected="${selected}">${escapeHtml(text)}${label}</li>`;
+            })
+            .join('');
+
         suggestionsList.hidden = false;
-        suggestionsList.innerHTML = html;
-    }
+    };
 
-    lastTypeTime = Date.now();
-    renderSuggestionList();
-    setTimeout(renderSuggestionList, 800, true);
-});
+    const updateClearBtn = () => {
+        clearBtn.hidden = input.value.length === 0;
+    };
 
-searchlineInput.addEventListener('keydown', function(event) {
-    if (event.key === 'Enter') {
-        event.preventDefault();
-        
-        const value = event.target.value.toLowerCase();
-        const sugContent = suggestions[Math.max(selectedSuggestionIndex, 0)]?.content;
-        const sugType = suggestions[Math.max(selectedSuggestionIndex, 0)]?.type;
-        // const suggestionsList = getSitesSuggestions(value);
-        
-        if (
-            !suggestions ||
-            suggestions.length === 0 ||
-            event.shiftKey ||
-            selectedSuggestionIndex === -2 ||
-            !sugContent.startsWith(value)
-        ) {
-            return search(value);
+    const hideSuggestions = () => {
+        suggestions = [];
+        selectedIndex = -1;
+        suggestionsList.hidden = true;
+    };
+
+    /**
+     * Обновляет подсказки для текущего значения строки.
+     * Ответы приходят асинхронно, поэтому каждый запрос получает номер —
+     * отрисовываем только последний, иначе быстрые наборы текста дают «мигающий» список.
+     */
+    const refreshSuggestions = async () => {
+        const query = input.value.trim();
+        const currentRequest = ++requestId;
+
+        if (!query) {
+            hideSuggestions();
+            return;
         }
 
-        if (sugType === "site") {
-            return window.location.href = 'https://' + siteList[sugContent].url;
-        } else if (sugType === "requst") {
-            return search(sugContent);
+        const siteSuggestions = getSiteSuggestions(query);
+        const ddgSuggestions = await getDdgSuggestions(query);
+        if (currentRequest !== requestId) { return; }
+
+        suggestions = [...siteSuggestions, ...ddgSuggestions].slice(0, MAX_SUGGESTIONS);
+        selectedIndex = -1;
+        render();
+    };
+
+    const openSite = (alias) => {
+        window.location.href = `https://${siteList[alias].url}`;
+    };
+
+    const search = (query) => {
+        const template = selectedEngine ? ENGINE_BY_ATTRIBUTE[selectedEngine] : ENGINE_BY_ATTRIBUTE.google;
+        window.location.href = template + encodeURIComponent(query);
+    };
+
+    /**
+     * Общий обработчик Enter и клика.
+     * Точно введённый алиас (например «вк» или «vk») открывает сайт сразу —
+     * иначе привычный «набрал vk, нажал Enter» превратился бы в поиск по слову vk.
+     */
+    const activate = (suggestion) => {
+        const typed = input.value.trim().toLowerCase();
+        if (!suggestion) {
+            siteList[typed] ? openSite(typed) : search(input.value);
+            return;
+        }
+        suggestion.type === 'site' ? openSite(suggestion.text) : search(suggestion.text);
+    };
+
+    const moveSelection = (step) => {
+        if (suggestions.length === 0) { return; }
+
+        // selectedSuggestion = -1 означает «ничего не выбрано», шаг от него даёт первый/последний элемент
+        const count = suggestions.length;
+        selectedIndex = selectedIndex < 0
+            ? (step > 0 ? 0 : count - 1)
+            : (selectedIndex + step + count) % count;
+
+        render();
+        suggestionsList.children[selectedIndex]?.scrollIntoView({ block: 'nearest' });
+    };
+
+    input.addEventListener('input', () => {
+        updateClearBtn();
+        refreshSuggestions();
+    });
+
+    input.addEventListener('keydown', (event) => {
+        switch (event.key) {
+            case 'Enter':
+                event.preventDefault();
+                activate(suggestions[selectedIndex] ?? null);
+                break;
+            case 'ArrowDown':
+                event.preventDefault();
+                moveSelection(1);
+                break;
+            case 'Tab':
+                // Tab перебирает подсказки, а не уплывает по элементам страницы;
+                // без подсказок перехват не нужен — иначе ловушка клавиатуры
+                if (suggestions.length === 0) { break; }
+                event.preventDefault();
+                moveSelection(1);
+                break;
+            case 'ArrowUp':
+                event.preventDefault();
+                moveSelection(-1);
+                break;
+            case 'ArrowRight':
+                // Принимаем подсказку как автодополнение, не выходя из строки
+                if (selectedIndex >= 0) {
+                    event.preventDefault();
+                    input.value = suggestions[selectedIndex].text;
+                    hideSuggestions();
+                }
+                break;
+            case 'Escape':
+                hideSuggestions();
+                break;
+        }
+    });
+
+    // Мышью подсказки выбираются кликом; mousedown, а не click, чтобы input не терял фокус
+    suggestionsList.addEventListener('mousedown', (event) => {
+        const item = event.target.closest('.suggestion-item');
+        if (!item) { return; }
+
+        event.preventDefault();
+        activate(suggestions[Number(item.dataset.index)]);
+    });
+
+    clearBtn.addEventListener('click', () => {
+        input.value = '';
+        updateClearBtn();
+        hideSuggestions();
+        input.focus();
+    });
+
+    // Выбор поисковой системы повторным кликом снимается — строка снова ищет «как обычно»
+    engineBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const engine = btn.dataset.engine;
+            const isTogglingOff = selectedEngine === engine;
+
+            engineBtns.forEach((other) => {
+                other.setAttribute('aria-checked', 'false');
+            });
+
+            if (isTogglingOff) {
+                selectedEngine = null;
+                return;
+            }
+
+            selectedEngine = engine;
+            btn.setAttribute('aria-checked', 'true');
+        });
+    });
+
+    const init = async () => {
+        try {
+            const response = await fetch('sites.json');
+            siteList = await response.json();
+        } catch {
+            console.warn('Не удалось загрузить sites.json — подсказки сайтов недоступны');
         }
 
-        
-        // const targetUrl = siteList[suggestions[Math.max(selectedSuggestionIndex, 0)]].url;
+        input.focus();
+    };
 
-        // if (targetUrl !== null) {
-        //     window.location.href = 'https://' + targetUrl;
-        // }
-    } else if (event.key === 'Tab' || event.key === 'ArrowDown') {
-        event.preventDefault();
-        selectedSuggestionIndex = (Math.max(selectedSuggestionIndex+1, 0)) % suggestions.length;
-
-        suggestionsList.classList.remove('disabled-suggestions-list');
-        suggestionsList.querySelectorAll('.suggestion').forEach((node) => { node.classList.remove('active-suggestion'); });
-        suggestionsList.querySelectorAll('.suggestion')[selectedSuggestionIndex].classList.add('active-suggestion');
-    } else if (event.key === 'ArrowUp') {
-        event.preventDefault();
-        selectedSuggestionIndex = Math.abs((Math.max(selectedSuggestionIndex, 0)-1) % suggestions.length);
-
-        suggestionsList.classList.remove('disabled-suggestions-list');
-        suggestionsList.querySelectorAll('.suggestion').forEach((node) => { node.classList.remove('active-suggestion'); });
-        suggestionsList.querySelectorAll('.suggestion')[selectedSuggestionIndex].classList.add('active-suggestion');
-    } else if (event.key === 'ArrowRight') {
-        event.preventDefault();
-        event.target.value = suggestions[Math.max(selectedSuggestionIndex, 0)].content;
-    } else if (event.key === 'Escape') {
-        event.preventDefault();
-
-        selectedSuggestionIndex = -2;
-        suggestionsList.classList.add('disabled-suggestions-list');
-        suggestionsList.querySelectorAll('.suggestion').forEach((node) => { node.classList.remove('active-suggestion'); });
-    }
-});
-
-// Always focused
-searchlineInput.addEventListener('blur', () => { searchlineInput.focus(); }); 
-
-
-searchEngineBtns.forEach((btn) => {btn.addEventListener('click', () => {
-    if (btn.classList.contains('selected-search-engine-btn')) {
-        btn.classList.remove('selected-search-engine-btn');
-        selectedEngine = null;
-        return;
-    }
-
-    selectedEngine = SearchEngines[btn.textContent.toUpperCase()];
-
-    searchEngineBtns.forEach((b) => { b.classList.remove('selected-search-engine-btn'); });
-    btn.classList.add('selected-search-engine-btn');
-})});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// /**
-//  * Рендеринг подсказок
-//  */
-// function renderSuggestions(suggestionsArray, searchQuery) {
-//     suggestions = suggestionsArray;
-//     selectedIndex = -1;
-//     isNavigating = false;
-
-//     if (!suggestionsArray || suggestionsArray.length === 0) {
-//         suggestionsList.classList.remove('active');
-//         return;
-//     }
-
-//     let html = `<div class="suggestions-count">${suggestionsArray.length} подсказок</div>`;
-
-//     suggestionsArray.forEach((suggestion, index) => {
-//         // Подсветка совпадения
-//         const highlighted = highlightMatch(suggestion, searchQuery);
-//         html += `
-//             <div class="suggestion-item" data-index="${index}">
-//                 <span class="icon">🔍</span>
-//                 <span class="text">${highlighted}</span>
-//             </div>
-//         `;
-//     });
-
-//     suggestionsList.innerHTML = html;
-//     suggestionsList.classList.add('active');
-
-//     // Добавляем обработчики кликов
-//     document.querySelectorAll('.suggestion-item').forEach(item => {
-//         item.addEventListener('mousedown', function(e) {
-//             e.preventDefault(); // предотвращаем потерю фокуса
-//             const index = parseInt(this.dataset.index);
-//             selectSuggestion(index);
-//         });
-
-//         item.addEventListener('mouseenter', function() {
-//             const index = parseInt(this.dataset.index);
-//             if (!isNavigating) {
-//                 setActiveSuggestion(index);
-//             }
-//         });
-//     });
-// }
-
-// /**
-//  * Установка активной подсказки
-//  */
-// function setActiveSuggestion(index) {
-//     selectedIndex = index;
-//     document.querySelectorAll('.suggestion-item').forEach((item, i) => {
-//         item.classList.toggle('active', i === index);
-//     });
-
-//     // Прокрутка к активному элементу
-//     const activeItem = document.querySelector('.suggestion-item.active');
-//     if (activeItem) {
-//         activeItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-//     }
-// }
-
-// /**
-//  * Выбор подсказки (по клику или Enter)
-//  */
-// function selectSuggestion(index) {
-//     if (index >= 0 && index < suggestions.length) {
-//         const value = suggestions[index];
-//         input.value = value;
-//         suggestionsList.classList.remove('active');
-//         selectedIndex = -1;
-//         input.focus();
-        
-//         // Здесь можно выполнить поиск
-//         performSearch(value);
-//     }
-// }
-
-
-loadSiteList();
+    init();
+})();

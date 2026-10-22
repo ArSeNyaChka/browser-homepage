@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
     "name": "My Start Page",
-    "version": "0.1", 
-    "description": "",
+    "version": "0.2.0",
+    "description": "A minimal, themed new-tab page with quick-access icons and smart search.",
 
     "chrome_url_overrides": {
         "newtab": "index.html"
