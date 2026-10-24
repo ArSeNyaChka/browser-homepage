@@ -1,66 +1,29 @@
-/* ─── Тема «Терминал» ───
-   Подключается вторым файлом после style.css и переопределяет только токены
-   и несколько правил, не поддающихся токенизации.
-
-   <link rel="stylesheet" href="css/style.css">
-   <link rel="stylesheet" href="css/terminal.css">
-*/
-
+/* ─── Тема «Терминал» (переопределение токенов) ─── */
 :root {
     --color-bg: #0a0e0a;
-    --color-surface: #10231a;
-    --color-surface-highlight: #143022;
+    --color-surface: #0f1a12;
+    --color-surface-highlight: #142b1d;
     --color-accent: #33ff77;
     --color-accent-dark: #1e8f47;
     --color-text: #33ff77;
     --color-text-muted: #1e8f47;
 
-    --radius-pill: 2px;
-    --radius-card: 2px;
-
     --glow-color: #33ff77;
 
-    --font-family: 'Cascadia Mono', 'Fira Code', 'JetBrains Mono', monospace;
-
-    --transition-speed: 0.1s;
+    --font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
 }
 
-/* Иконки в терминале — плоские и без скругления-свечения */
-.icon-btn {
-    border-radius: var(--radius-pill);
+.tui-btn:hover {
+    box-shadow: 0 0 6px var(--glow-color);
 }
 
-.icon-btn__img {
+.tui-btn__img {
     filter: brightness(0) saturate(100%) invert(88%) sepia(60%) saturate(600%)
             hue-rotate(80deg) brightness(95%) contrast(90%);
 }
 
-.icon-btn:hover .icon-btn__img {
+.tui-btn:hover .tui-btn__img {
     filter: brightness(0) saturate(100%) invert(88%) sepia(60%) saturate(600%)
             hue-rotate(80deg) brightness(95%) contrast(90%)
-            drop-shadow(0 0 6px var(--glow-color));
-}
-
-.search-input {
-    border: 1px solid var(--color-accent-dark);
-    letter-spacing: 0.03em;
-}
-
-.search-input:focus {
-    box-shadow: 0 0 0 1px var(--color-accent);
-}
-
-.suggestion-item {
-    border: 1px solid transparent;
-}
-
-.suggestion-item:hover,
-.suggestion-item[aria-selected="true"] {
-    border-color: var(--color-accent);
-    transform: none;
-}
-
-.suggestion-item,
-.suggestion-item__name {
-    font-family: var(--font-family);
+            drop-shadow(0 0 4px var(--glow-color));
 }

@@ -14,9 +14,9 @@
         document.documentElement.dataset.theme = theme;
     };
 
-    let savedTheme = 'standart';
+    let savedTheme = 'standard';
     try {
-        savedTheme = localStorage.getItem(THEME_KEY) || 'standart';
+        savedTheme = localStorage.getItem(THEME_KEY) || 'standard';
     } catch {
         // localStorage недоступен (например, в приватном режиме) — остаётся базовая тема
     }
@@ -34,6 +34,26 @@
             }
         },
     };
+
+    // Переключатель темы живёт в диалоге настроек. Сравнение идёт по признаку
+    // «терминал или нет», а не по точному совпадению: в localStorage уже лежат
+    // значения со старым написанием 'standart', их нельзя терять.
+    const themeRadios = document.querySelectorAll('input[name="theme"]');
+
+    const syncThemeRadios = () => {
+        const isTerminal = window.homepageTheme.current() === 'terminal';
+        themeRadios.forEach((radio) => {
+            radio.checked = (radio.value === 'terminal') === isTerminal;
+        });
+    };
+
+    themeRadios.forEach((radio) => {
+        radio.addEventListener('change', () => {
+            if (radio.checked) { window.homepageTheme.set(radio.value); }
+        });
+    });
+
+    syncThemeRadios();
 
     // Строка поиска — главный элемент страницы: клик в любом её месте возвращает фокус в ввод.
     // Клики внутри диалога и по интерактивным элементам игнорируем,

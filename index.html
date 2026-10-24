@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/terminal.css" id="terminal-theme" disabled>
     <title>Meow</title>
@@ -10,58 +13,71 @@
 <body>
     <main class="page-layout">
         <nav class="sidebar sidebar--left" aria-label="Левая панель">
-            <a href="https://github.com" class="icon-btn" aria-label="GitHub">
-                <img src="icons/github_icon.png" alt="" class="icon-btn__img">
+            <a href="https://github.com" class="tui-btn" aria-label="GitHub">
+                <img src="icons/github_icon.png" alt="" class="tui-btn__img">
+                <span class="tui-btn__label">GitHub</span>
             </a>
-            <a href="https://vk.ru" class="icon-btn" aria-label="VK">
-                <img src="icons/vk_icon.png" alt="" class="icon-btn__img">
+            <a href="https://vk.ru" class="tui-btn" aria-label="VK">
+                <img src="icons/vk_icon.png" alt="" class="tui-btn__img">
+                <span class="tui-btn__label">VK</span>
             </a>
-            <a href="https://discord.com/app" class="icon-btn" aria-label="Discord">
-                <img src="icons/discord_icon.png" alt="" class="icon-btn__img">
+            <a href="https://discord.com/app" class="tui-btn" aria-label="Discord">
+                <img src="icons/discord_icon.png" alt="" class="tui-btn__img">
+                <span class="tui-btn__label">Discord</span>
             </a>
-            <a href="https://ru.pinterest.com" class="icon-btn" aria-label="Pinterest">
-                <img src="icons/discord_icon.png" alt="" class="icon-btn__img">
+            <a href="https://ru.pinterest.com" class="tui-btn" aria-label="Pinterest">
+                <img src="icons/discord_icon.png" alt="" class="tui-btn__img">
+                <span class="tui-btn__label">Pinterest</span>
             </a>
         </nav>
 
         <section class="center-panel">
             <div class="search-container">
-                <div class="engine-selector" role="radiogroup" aria-label="Поисковая система">
-                    <button class="engine-btn" role="radio" aria-checked="false" data-engine="google">Google</button>
-                    <button class="engine-btn" role="radio" aria-checked="false" data-engine="duckduckgo">DuckDuckGo</button>
-                    <button class="engine-btn" role="radio" aria-checked="false" data-engine="youtube">YouTube</button>
-                </div>
-                <div class="search-input-wrapper">
-                    <input
-                        type="text"
-                        id="search-line-input"
-                        class="search-input"
-                        autocomplete="off"
-                        spellcheck="false"
-                        autofocus
-                        placeholder="Поиск или адрес сайта…"
-                        aria-label="Поисковая строка"
-                        aria-controls="suggestions-list"
-                        aria-autocomplete="list"
-                    >
-                    <button id="clear-btn" class="clear-btn" aria-label="Очистить" hidden>✕</button>
+                <div class="tui-box tui-box--input">
+                    <div class="search-input-wrapper">
+                        <input
+                            type="text"
+                            id="search-line-input"
+                            class="search-input"
+                            autocomplete="off"
+                            spellcheck="false"
+                            autofocus
+                            placeholder="Search..."
+                            aria-label="Поисковая строка"
+                            aria-controls="suggestions-list"
+                            aria-autocomplete="list"
+                        >
+                        <button id="clear-btn" class="clear-btn" aria-label="Очистить" hidden>╳</button>
+                    </div>
+                    <div class="engine-selector tui-bar" role="radiogroup" aria-label="Поисковая система">
+                        <button class="engine-btn tui-bar__item" role="radio" aria-checked="false" data-engine="google">Google</button>
+                        <span class="tui-bar__sep" aria-hidden="true">─</span>
+                        <button class="engine-btn tui-bar__item" role="radio" aria-checked="false" data-engine="duckduckgo">DuckDuckGo</button>
+                        <span class="tui-bar__sep" aria-hidden="true">─</span>
+                        <button class="engine-btn tui-bar__item" role="radio" aria-checked="false" data-engine="youtube">YouTube</button>
+                        <span class="tui-bar__fill" aria-hidden="true"></span>
+                    </div>
                 </div>
                 <ul id="suggestions-list" class="suggestions-list" role="listbox" hidden></ul>
             </div>
         </section>
 
         <nav class="sidebar sidebar--right" aria-label="Правая панель">
-            <a href="https://google.com" class="icon-btn" aria-label="Google">
-                <img src="icons/google_icon.png" alt="" class="icon-btn__img">
+            <a href="https://google.com" class="tui-btn" aria-label="Google">
+                <img src="icons/google_icon.png" alt="" class="tui-btn__img">
+                <span class="tui-btn__label">Google</span>
             </a>
-            <a href="https://youtube.com" class="icon-btn" aria-label="YouTube">
-                <img src="icons/youtube_icon.png" alt="" class="icon-btn__img">
+            <a href="https://youtube.com" class="tui-btn" aria-label="YouTube">
+                <img src="icons/youtube_icon.png" alt="" class="tui-btn__img">
+                <span class="tui-btn__label">YouTube</span>
             </a>
-            <a href="https://music.youtube.com" class="icon-btn" aria-label="YouTube Music">
-                <img src="icons/ytm_icon.png" alt="" class="icon-btn__img">
+            <a href="https://music.youtube.com" class="tui-btn" aria-label="YouTube Music">
+                <img src="icons/ytm_icon.png" alt="" class="tui-btn__img">
+                <span class="tui-btn__label">YTM</span>
             </a>
-            <a href="https://chat.deepseek.com" class="icon-btn" aria-label="DeepSeek">
-                <img src="icons/ai_icon.png" alt="" class="icon-btn__img">
+            <a href="https://chat.deepseek.com" class="tui-btn" aria-label="DeepSeek">
+                <img src="icons/ai_icon.png" alt="" class="tui-btn__img">
+                <span class="tui-btn__label">AI</span>
             </a>
         </nav>
     </main>
@@ -71,15 +87,32 @@
     <dialog id="aliases-dialog" class="aliases-dialog" aria-labelledby="aliases-title">
         <div class="aliases-dialog__head">
             <h2 id="aliases-title" class="aliases-dialog__title">Алиасы сайтов</h2>
-            <button id="aliases-close-btn" class="aliases-dialog__close" aria-label="Закрыть">✕</button>
+            <button id="aliases-close-btn" class="aliases-dialog__close" aria-label="Закрыть">╳</button>
         </div>
 
-        <form id="alias-form" class="alias-form">
-            <input id="alias-name" class="alias-form__input" placeholder="Название, например Notion" autocomplete="off" required>
-            <input id="alias-url" class="alias-form__input" placeholder="Адрес, например notion.so" autocomplete="off" required>
-            <input id="alias-values" class="alias-form__input alias-form__input--wide" placeholder="Алиасы через пробел: n, notion" autocomplete="off" required>
-            <button type="submit" class="alias-form__submit">Добавить</button>
-        </form>
+        <section class="dialog-section">
+            <h3 class="dialog-section__title">Тема</h3>
+            <div class="theme-selector" role="radiogroup" aria-label="Выбор темы">
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="standard" checked>
+                    <span class="theme-option__label">Стандартная</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="terminal">
+                    <span class="theme-option__label">Терминал</span>
+                </label>
+            </div>
+        </section>
+
+        <section class="dialog-section">
+            <h3 class="dialog-section__title">Добавить сайт</h3>
+            <form id="alias-form" class="alias-form">
+                <input id="alias-name" class="alias-form__input" placeholder="Название, например Notion" autocomplete="off" required>
+                <input id="alias-url" class="alias-form__input" placeholder="Адрес, например notion.so" autocomplete="off" required>
+                <input id="alias-values" class="alias-form__input alias-form__input--wide" placeholder="Алиасы через пробел: n, notion" autocomplete="off" required>
+                <button type="submit" class="alias-form__submit">Добавить</button>
+            </form>
+        </section>
 
         <ul id="aliases-list" class="aliases-list"></ul>
 
