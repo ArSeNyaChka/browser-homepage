@@ -87,7 +87,10 @@
             return;
         }
 
-        const siteSuggestions = window.sites.findSites(query, MAX_SUGGESTIONS);
+        // Если выбрана поисковая система — алиасы не показываем, только строки поиска
+        const siteSuggestions = selectedEngine
+            ? []
+            : window.sites.findSites(query, MAX_SUGGESTIONS);
         const ddgSuggestions = await getDdgSuggestions(query);
         if (currentRequest !== requestId) { return; }
 
@@ -107,17 +110,27 @@
 
     /**
      * Общий обработчик Enter и клика.
-     * Точно введённый алиас открывает сайт сразу — иначе привычный
-     * «набрал vk, нажал Enter» превратился бы в поиск по слову vk.
-     * Раскладка учитывается, поэтому «вк» и «vk» дают один результат.
+     *
+     * Приоритет прежний: набранное — начало алиаса → Enter ведёт на сайт, даже
+     * когда подсказка не выбрана. Выбранная поисковая система алиасы отключает,
+     * а Shift+Enter всегда ищет ровно набранным, без алиасов и подсказок.
      */
-    const activate = (suggestion) => {
-        if (!suggestion) {
-            const exact = window.sites.findSite(input.value);
-            exact ? openSite(exact.alias) : search(input.value);
+    const activate = (suggestion, { forceSearch = false } = {}) => {
+        if (forceSearch || selectedEngine) {
+            search(input.value);
             return;
         }
-        suggestion.type === 'site' ? openSite(suggestion.text) : search(suggestion.text);
+
+        if (suggestion?.type === 'site') { openSite(suggestion.text); return; }
+
+        const query = window.layout.toEnLayout(input.value.trim());
+        const first = suggestions[0];
+        if (!suggestion && first?.type === 'site' && window.layout.toEnLayout(first.text).startsWith(query)) {
+            openSite(first.text);
+            return;
+        }
+
+        search(suggestion ? suggestion.text : input.value);
     };
 
     const moveSelection = (step) => {
@@ -142,7 +155,8 @@
         switch (event.key) {
             case 'Enter':
                 event.preventDefault();
-                activate(suggestions[selectedIndex] ?? null);
+                // Shift+Enter — точный поиск по введённому, без алиасов и подсказок
+                activate(suggestions[selectedIndex] ?? null, { forceSearch: event.shiftKey });
                 break;
             case 'ArrowDown':
                 event.preventDefault();
