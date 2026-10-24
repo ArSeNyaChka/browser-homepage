@@ -118,6 +118,12 @@ input:focus {
             drop-shadow(0 0 10px var(--glow-color));
 }
 
+/* Подписи к иконкам нужны не всем темам: в стандартной кнопки — круглые
+   иконки без текста, темы вроде «Минимализма» включают их сами */
+.icon-btn__label {
+    display: none;
+}
+
 /* ─── Center panel ─── */
 .center-panel {
     grid-area: center;
@@ -502,6 +508,46 @@ input:focus {
     text-align: right;
     font-size: 0.8rem;
     color: var(--color-text-muted);
+}
+
+/* Секции диалога: тема вынесена в отдельный блок над формой добавления */
+.dialog-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.dialog-section__title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.theme-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.theme-option {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background-color: var(--color-surface);
+    border-radius: var(--radius-pill);
+    padding: 0.35rem 0.9rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease;
+}
+
+.theme-option:hover {
+    background-color: var(--color-surface-highlight);
+}
+
+.theme-option input[type="radio"] {
+    accent-color: var(--color-accent);
+    cursor: pointer;
 }
 
 /* ─── Адаптив ─── */

@@ -2,7 +2,7 @@
    Тема «Минимализм» — слой переопределений поверх style.css
    ═══════════════════════════════════════════════════════════ */
 
-:root {
+[data-theme="minimalism"] {
     --color-bg: #0d0f13;
     --color-surface: #16191d;
     --color-surface-highlight: #1e2228;
@@ -23,14 +23,11 @@
     --transition-speed: 0.15s;
 
     --font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-
     --max-input-width: 780px;
 }
 
 /* ─── Sidebar: одинаковая ширина кнопок ─── */
-/* grid вместо flex: одна колонка 1fr растягивает все кнопки на ширину
-   контейнера, поэтому они равные и рамка выглядит строкой меню */
-.sidebar {
+[data-theme="minimalism"] .sidebar {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--sidebar-gap);
@@ -39,7 +36,7 @@
 }
 
 /* ─── Icon buttons ─── */
-.icon-btn {
+[data-theme="minimalism"] .icon-btn {
     display: flex;
     align-items: center;
     gap: 0.4rem;
@@ -60,14 +57,14 @@
     height: auto;
 }
 
-.icon-btn:hover {
+[data-theme="minimalism"] .icon-btn:hover {
     background: var(--color-surface-highlight);
     color: var(--color-accent);
     border-color: var(--color-text-muted);
     transform: none;
 }
 
-.icon-btn__img {
+[data-theme="minimalism"] .icon-btn__img {
     width: 20px;
     height: 20px;
     object-fit: contain;
@@ -77,34 +74,50 @@
     transition: filter var(--transition-speed) ease;
 }
 
-.icon-btn:hover .icon-btn__img {
+[data-theme="minimalism"] .icon-btn:hover .icon-btn__img {
     filter: brightness(0) saturate(100%) invert(70%) sepia(0%) saturate(100%)
             hue-rotate(140deg) brightness(85%) contrast(95%);
 }
 
+[data-theme="minimalism"] .icon-btn__label {
+    display: block;
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
 /* ─── Center panel ─── */
-.center-panel {
+[data-theme="minimalism"] .center-panel {
     padding: 2rem 0;
 }
 
 /* ─── Search container ─── */
-.search-container {
+/* Рамка на контейнере: поле ввода, панель движков и подсказки внутри —
+   все без собственных бордеров, чтобы не было двойных линий. */
+[data-theme="minimalism"] .search-container {
     align-items: stretch;
+    max-width: var(--max-input-width);
+    gap: 0;
+    border: 1px solid var(--color-text-muted);
+    border-radius: 0;
+    background: var(--color-surface);
 }
 
-/* ─── Engine selector (TUI bar) ─── */
-.engine-selector {
+[data-theme="minimalism"] .search-input-wrapper { order: 1; border: none; padding: 0; }
+[data-theme="minimalism"] .engine-selector { order: 2; border: none; margin: 0; }
+[data-theme="minimalism"] .suggestions-list { order: 3; border: none; margin-top: 0; }
+
+/* ─── Engine selector (нижняя строка рамки поиска) ─── */
+[data-theme="minimalism"] .engine-selector {
     display: flex;
     align-items: center;
     gap: 0;
     padding: 0 0.5rem;
     border-top: 1px solid var(--color-text-muted);
-    border-radius: 0;
-    margin-bottom: 0;
     flex-wrap: nowrap;
+    background: var(--color-surface);
 }
 
-.engine-btn {
+[data-theme="minimalism"] .engine-btn {
     border: none;
     border-radius: 0;
     background: transparent;
@@ -118,30 +131,35 @@
     transform: none;
 }
 
-.engine-btn:hover {
+[data-theme="minimalism"] .engine-btn:hover {
     color: var(--color-text);
     background: var(--color-surface-highlight);
     transform: none;
 }
 
-.engine-btn[aria-checked="true"],
-.engine-btn.selected {
+[data-theme="minimalism"] .engine-btn[aria-checked="true"],
+[data-theme="minimalism"] .engine-btn.selected {
     color: var(--color-accent);
     background: var(--color-surface-highlight);
 }
 
-.engine-btn[aria-checked="true"]:hover,
-.engine-btn.selected:hover {
+[data-theme="minimalism"] .engine-btn[aria-checked="true"]:hover,
+[data-theme="minimalism"] .engine-btn.selected:hover {
     color: var(--color-text);
     transform: none;
 }
 
 /* ─── Search input ─── */
-.search-input {
+[data-theme="minimalism"] .search-input-wrapper {
+    padding: 0;
+    border: 1px solid var(--color-text-muted);
+}
+
+[data-theme="minimalism"] .search-input {
     font-size: var(--font-size-search);
     font-family: var(--font-family);
     height: 2.2rem;
-    padding: 0 2.5rem 0 0;
+    padding: 0.5rem 2.5rem 0.5rem 0.75rem;
     border: none;
     border-radius: 0;
     background: transparent;
@@ -149,17 +167,17 @@
     caret-color: var(--color-accent);
 }
 
-.search-input::placeholder {
+[data-theme="minimalism"] .search-input::placeholder {
     color: var(--color-text-muted);
     opacity: 0.6;
 }
 
-.search-input:focus {
+[data-theme="minimalism"] .search-input:focus {
     box-shadow: none;
 }
 
 /* ─── Suggestions list (TUI style) ─── */
-.suggestions-list {
+[data-theme="minimalism"] .suggestions-list {
     margin-top: -1px;
     border: 1px solid var(--color-text-muted);
     border-top: none;
@@ -167,7 +185,7 @@
     background: var(--color-surface);
 }
 
-.suggestion-item {
+[data-theme="minimalism"] .suggestion-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -180,18 +198,18 @@
     border-radius: 0;
 }
 
-.suggestion-item:last-child {
+[data-theme="minimalism"] .suggestion-item:last-child {
     border-bottom: none;
 }
 
-.suggestion-item:hover,
-.suggestion-item[aria-selected="true"] {
+[data-theme="minimalism"] .suggestion-item:hover,
+[data-theme="minimalism"] .suggestion-item[aria-selected="true"] {
     background: var(--color-surface-highlight);
     color: var(--color-accent);
     transform: none;
 }
 
-.suggestion-item__name {
+[data-theme="minimalism"] .suggestion-item__name {
     font-size: 0.8em;
     color: var(--color-text-muted);
     opacity: 0.7;
@@ -199,12 +217,12 @@
     white-space: nowrap;
 }
 
-.suggestion-item[aria-selected="true"] .suggestion-item__name {
+[data-theme="minimalism"] .suggestion-item[aria-selected="true"] .suggestion-item__name {
     color: var(--color-text-muted);
 }
 
 /* ─── Aliases button ─── */
-.aliases-open-btn {
+[data-theme="minimalism"] .aliases-open-btn {
     border: 1px solid var(--color-text-muted);
     background: var(--color-surface);
     color: var(--color-text-muted);
@@ -220,7 +238,7 @@
     height: auto;
 }
 
-.aliases-open-btn:hover {
+[data-theme="minimalism"] .aliases-open-btn:hover {
     background: var(--color-surface-highlight);
     color: var(--color-text);
     border-color: var(--color-text);
@@ -228,27 +246,27 @@
 }
 
 /* ─── Dialog ─── */
-.aliases-dialog {
+[data-theme="minimalism"] .aliases-dialog {
     border: 1px solid var(--color-text-muted);
     border-radius: 0;
     font-family: var(--font-family);
 }
 
-.aliases-dialog__title {
+[data-theme="minimalism"] .aliases-dialog__title {
     font-size: 1.1rem;
     font-weight: 700;
 }
 
 /* ─── Sections inside dialog ─── */
-.dialog-section {
+[data-theme="minimalism"] .dialog-section {
     margin-bottom: 1.25rem;
 }
 
-.dialog-section:last-of-type {
+[data-theme="minimalism"] .dialog-section:last-of-type {
     margin-bottom: 0;
 }
 
-.dialog-section__title {
+[data-theme="minimalism"] .dialog-section__title {
     font-size: 0.95rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
@@ -256,12 +274,12 @@
 }
 
 /* ─── Theme selector ─── */
-.theme-selector {
+[data-theme="minimalism"] .theme-selector {
     display: flex;
     gap: 0.5rem;
 }
 
-.theme-option {
+[data-theme="minimalism"] .theme-option {
     display: flex;
     align-items: center;
     gap: 0.4rem;
@@ -274,11 +292,11 @@
     font-size: 0.85rem;
 }
 
-.theme-option:hover {
+[data-theme="minimalism"] .theme-option:hover {
     background: var(--color-surface-highlight);
 }
 
-.theme-option input[type="radio"] {
+[data-theme="minimalism"] .theme-option input[type="radio"] {
     appearance: none;
     width: 0.9rem;
     height: 0.9rem;
@@ -289,11 +307,11 @@
     transition: border-color var(--transition-speed) ease;
 }
 
-.theme-option input[type="radio"]:checked {
+[data-theme="minimalism"] .theme-option input[type="radio"]:checked {
     border-color: var(--color-accent);
 }
 
-.theme-option input[type="radio"]:checked::after {
+[data-theme="minimalism"] .theme-option input[type="radio"]:checked::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -305,13 +323,13 @@
     background: var(--color-accent);
 }
 
-.theme-option__label {
+[data-theme="minimalism"] .theme-option__label {
     color: var(--color-text);
     user-select: none;
 }
 
 /* Form */
-.alias-form__input {
+[data-theme="minimalism"] .alias-form__input {
     border: 1px solid var(--color-surface-highlight);
     border-radius: 0;
     background: var(--color-surface);
@@ -320,11 +338,11 @@
     font-size: 0.85rem;
 }
 
-.alias-form__input:focus {
+[data-theme="minimalism"] .alias-form__input:focus {
     border-color: var(--color-accent);
 }
 
-.alias-form__submit {
+[data-theme="minimalism"] .alias-form__submit {
     border: 1px solid var(--color-accent);
     border-radius: 0;
     background: transparent;
@@ -337,35 +355,35 @@
                 color var(--transition-speed) ease;
 }
 
-.alias-form__submit:hover {
+[data-theme="minimalism"] .alias-form__submit:hover {
     background: var(--color-accent);
     color: var(--color-bg);
 }
 
 /* List */
-.aliases-list {
+[data-theme="minimalism"] .aliases-list {
     scrollbar-width: thin;
     scrollbar-color: var(--color-surface-highlight) transparent;
 }
 
-.aliases-list__empty {
+[data-theme="minimalism"] .aliases-list__empty {
     font-size: 0.85rem;
     text-align: center;
     padding: 1rem 0;
 }
 
-.alias-group {
+[data-theme="minimalism"] .alias-group {
     border: 1px solid var(--color-surface-highlight);
     border-radius: 0;
     padding: 0.5rem 0.75rem;
 }
 
-.alias-group__name {
+[data-theme="minimalism"] .alias-group__name {
     font-size: 0.9rem;
     font-weight: 700;
 }
 
-.alias-group__url {
+[data-theme="minimalism"] .alias-group__url {
     flex: 1;
     font-size: 0.75rem;
     color: var(--color-text-muted);
@@ -374,7 +392,7 @@
     white-space: nowrap;
 }
 
-.alias-group__remove {
+[data-theme="minimalism"] .alias-group__remove {
     border: none;
     background: transparent;
     color: var(--color-text-muted);
@@ -382,18 +400,18 @@
     font-size: 0.85rem;
 }
 
-.alias-group__remove:hover {
+[data-theme="minimalism"] .alias-group__remove:hover {
     color: var(--color-accent);
 }
 
-.alias-group__aliases {
+[data-theme="minimalism"] .alias-group__aliases {
     display: flex;
     flex-wrap: wrap;
     gap: 0.3rem;
     padding: 0.3rem 0 0.1rem;
 }
 
-.alias-chip {
+[data-theme="minimalism"] .alias-chip {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
@@ -403,7 +421,7 @@
     font-size: 0.75rem;
 }
 
-.alias-chip__remove {
+[data-theme="minimalism"] .alias-chip__remove {
     border: none;
     background: transparent;
     color: inherit;
@@ -412,19 +430,19 @@
     font-size: 0.7rem;
 }
 
-.alias-chip__remove:hover {
+[data-theme="minimalism"] .alias-chip__remove:hover {
     opacity: 1;
 }
 
 /* Footer */
-.aliases-dialog__footer {
+[data-theme="minimalism"] .aliases-dialog__footer {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.5rem;
 }
 
-.aliases-file-btn {
+[data-theme="minimalism"] .aliases-file-btn {
     border: 1px solid var(--color-surface-highlight);
     border-radius: 0;
     background: var(--color-surface);
@@ -437,17 +455,17 @@
                 color var(--transition-speed) ease;
 }
 
-.aliases-file-btn:hover {
+[data-theme="minimalism"] .aliases-file-btn:hover {
     background: var(--color-surface-highlight);
     color: var(--color-text);
 }
 
-.aliases-file-btn--danger:hover {
+[data-theme="minimalism"] .aliases-file-btn--danger:hover {
     border-color: var(--color-accent);
     color: var(--color-accent);
 }
 
-.aliases-status {
+[data-theme="minimalism"] .aliases-status {
     flex: 1;
     min-width: 120px;
     text-align: right;
@@ -457,7 +475,7 @@
 
 /* ─── Адаптив ─── */
 @media (max-width: 900px) {
-    .page-layout {
+    [data-theme="minimalism"] .page-layout {
         grid-template-columns: var(--sidebar-width) 1fr;
         grid-template-areas:
             "left center"
@@ -467,7 +485,7 @@
         padding: 1rem;
     }
 
-    .sidebar--right {
+    [data-theme="minimalism"] .sidebar--right {
         grid-auto-flow: column;
         grid-auto-columns: minmax(0, auto);
         justify-content: center;
@@ -478,7 +496,7 @@
 }
 
 @media (max-width: 600px) {
-    .page-layout {
+    [data-theme="minimalism"] .page-layout {
         grid-template-columns: 1fr;
         grid-template-areas:
             "left"
@@ -489,8 +507,8 @@
         padding: 0.75rem;
     }
 
-    .sidebar--left,
-    .sidebar--right {
+    [data-theme="minimalism"] .sidebar--left,
+    [data-theme="minimalism"] .sidebar--right {
         grid-auto-flow: column;
         grid-auto-columns: minmax(0, auto);
         justify-content: center;
@@ -499,33 +517,33 @@
         padding: 0;
     }
 
-    .sidebar--right {
+    [data-theme="minimalism"] .sidebar--right {
         padding-bottom: calc(var(--sidebar-width) / 4 + 0.5rem);
     }
 
-    :root {
+    [data-theme="minimalism"] {
         --max-input-width: 100%;
     }
 
-    .center-panel {
+    [data-theme="minimalism"] .center-panel {
         padding: 1rem 0;
     }
 
-    .alias-form {
+    [data-theme="minimalism"] .alias-form {
         grid-template-columns: 1fr;
     }
 
-    .aliases-status {
+    [data-theme="minimalism"] .aliases-status {
         text-align: left;
     }
 
-    .theme-selector {
+    [data-theme="minimalism"] .theme-selector {
         flex-direction: column;
     }
 }
 
 @media (max-width: 380px) {
-    .engine-btn {
+    [data-theme="minimalism"] .engine-btn {
         padding: 0.35rem 0.4rem;
         font-size: 0.7rem;
     }
