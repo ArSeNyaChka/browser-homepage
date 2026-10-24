@@ -47,10 +47,10 @@
                 <div class="alias-group__head">
                     <span class="alias-group__name">${escapeHtml(name)}</span>
                     <span class="alias-group__url">${escapeHtml(url)}</span>
-                    <button type="button" class="alias-group__remove" data-action="remove-site" title="Удалить сайт со всеми алиасами">╳</button>
+                    <button type="button" class="alias-group__remove" data-action="remove-site" title="Удалить сайт со всеми алиасами">✕</button>
                 </div>
                 <div class="alias-group__aliases">
-                    ${aliases.map((alias) => `<span class="alias-chip">${escapeHtml(alias)}<button type="button" class="alias-chip__remove" data-action="remove-alias" data-alias="${escapeHtml(alias)}" title="Удалить алиас">╳</button></span>`).join('')}
+                    ${aliases.map((alias) => `<span class="alias-chip">${escapeHtml(alias)}<button type="button" class="alias-chip__remove" data-action="remove-alias" data-alias="${escapeHtml(alias)}" title="Удалить алиас">✕</button></span>`).join('')}
                 </div>
             </li>
         `).join('');

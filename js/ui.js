@@ -5,46 +5,55 @@
     'use strict';
 
     const THEME_KEY = 'homepage.theme';
-    const terminalTheme = document.getElementById('terminal-theme');
+    const DEFAULT_THEME = 'standard';
 
-    const applyTheme = (theme) => {
-        if (terminalTheme) {
-            terminalTheme.disabled = theme !== 'terminal';
-        }
-        document.documentElement.dataset.theme = theme;
+    /**
+     * Кроме стандартной темы, которая живёт в style.css и загружена всегда,
+     * каждая тема — отдельный <link disabled>, включаемый по имени.
+     * Старое значение 'standart' из прошлых версий считаем стандартной темой.
+     */
+    const THEME_LINKS = {
+        terminal: document.getElementById('terminal-theme'),
+        minimalism: document.getElementById('minimalism-theme'),
     };
 
-    let savedTheme = 'standard';
+    const normalizeTheme = (name) => (name in THEME_LINKS ? name : DEFAULT_THEME);
+
+    const applyTheme = (theme) => {
+        const name = normalizeTheme(theme);
+        for (const [key, link] of Object.entries(THEME_LINKS)) {
+            if (link) { link.disabled = key !== name; }
+        }
+        document.documentElement.dataset.theme = name;
+    };
+
+    let savedTheme = DEFAULT_THEME;
     try {
-        savedTheme = localStorage.getItem(THEME_KEY) || 'standard';
+        savedTheme = normalizeTheme(localStorage.getItem(THEME_KEY));
     } catch {
         // localStorage недоступен (например, в приватном режиме) — остаётся базовая тема
     }
     applyTheme(savedTheme);
 
-    /** Тема сохраняется, но переключается вне этого файла: localStorage.setItem(...) + applyTheme. */
     window.homepageTheme = {
         current: () => document.documentElement.dataset.theme,
         set: (theme) => {
             applyTheme(theme);
             try {
-                localStorage.setItem(THEME_KEY, theme);
+                localStorage.setItem(THEME_KEY, window.homepageTheme.current());
             } catch {
                 // не критично: тема применена, но не запомнится
             }
         },
     };
 
-    // Переключатель темы живёт в диалоге настроек. Сравнение идёт по признаку
-    // «терминал или нет», а не по точному совпадению: в localStorage уже лежат
-    // значения со старым написанием 'standart', их нельзя терять.
+    // Переключатель темы живёт в диалоге настроек: отмечаем сохранённую тему
+    // и реагируем на выбор новой.
     const themeRadios = document.querySelectorAll('input[name="theme"]');
 
     const syncThemeRadios = () => {
-        const isTerminal = window.homepageTheme.current() === 'terminal';
-        themeRadios.forEach((radio) => {
-            radio.checked = (radio.value === 'terminal') === isTerminal;
-        });
+        const current = window.homepageTheme.current();
+        themeRadios.forEach((radio) => { radio.checked = radio.value === current; });
     };
 
     themeRadios.forEach((radio) => {
